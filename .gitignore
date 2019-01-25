@@ -1,0 +1,7 @@
+__pycache__/
+.vscode/
+CT_data_batch1/
+MR_data_batch1/
+test/
+train/
+Reports/
