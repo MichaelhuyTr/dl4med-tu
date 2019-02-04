@@ -1,5 +1,6 @@
 import numpy as np,sys,os
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import cv2
 import pydicom
 
@@ -7,7 +8,9 @@ from model import UNet
 
 
 training_dirs = [
-    './train'
+    # './MR_data_batch1/1/T1DUAL',
+    #'./train'
+    './train_mri'
     # './CT_data_batch1/1',
     # './CT_data_batch1/2',
     # './CT_data_batch1/5',
@@ -74,6 +77,12 @@ def get_pixels_hu(scans):
     y = np.expand_dims(x, axis=3)
     return y
 
+# For MRI
+def get_pixel_arrays(scans):
+    image = np.stack([s.pixel_array for s in scans])
+    x = np.array(image, dtype=np.int16)
+    y = np.expand_dims(x, axis=3)
+    return y
 
 # Reading png data for labeling every pixel
 def get_ground_data(paths):
@@ -86,7 +95,8 @@ def get_ground_data(paths):
 
 print('Loading ct dicom training data ...')
 cts = read_dicoms(training_data)
-imgs = get_pixels_hu(cts)
+# imgs = get_pixels_hu(cts)
+imgs_mri = get_pixel_arrays(cts)
 
 print('Loading png ground data ...')
 png_imgs = get_ground_data(ground_data)
@@ -113,4 +123,23 @@ png_imgs = get_ground_data(ground_data)
 
 # Initializing u-net and train the network
 fcn = UNet()
-fcn.train(imgs, png_imgs)
+# fcn.train(imgs, png_imgs) ##### TRAIN CT
+fcn.train(imgs_mri, png_imgs, (256,256,1)) ##### TRAIN MRI
+
+
+
+
+
+# # TESTING
+# test_data_path = ['./CT_data_batch1/10/DICOM_anon/i0081,0000b.dcm']
+# test2 = read_dicoms(test_data_path)
+# test1 = get_pixels_hu(test2)
+
+# hi = fcn.predict(test1)
+
+# # OUTPUT FILE plot
+# plt.imshow(np.squeeze(hi[0], axis=2))
+# plt.show()
+
+print('OK')
+

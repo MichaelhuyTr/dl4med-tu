@@ -1,6 +1,6 @@
 import numpy as np
 
-from keras.models import Model
+from keras.models import Model, load_model
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D, Conv2DTranspose, UpSampling2D
 from keras.layers import Input
@@ -14,9 +14,14 @@ class UNet:
     def init(self):
         self.create_unet()
 
-    def train(self, dicom_list, ground_list):
-        self.create_unet()
+    def train(self, dicom_list, ground_list, i_size):
+        self.create_unet(input_size = i_size)
         self.model.fit(dicom_list, ground_list, batch_size=32, epochs=2, verbose=1)
+        self.model.save('my_model.h5')
+
+    def predict(self, input):
+        self.model = load_model('my_model.h5')
+        return self.model.predict(input, batch_size=None, verbose=0, steps=None)
 
     def create_unet(self, input_size = (512,512,1)):
         self.inputs = Input(input_size)
