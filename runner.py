@@ -9,9 +9,9 @@ from model import UNet
 
 training_dirs = [
     # './MR_data_batch1/1/T1DUAL',
-    #'./train'
-    './train_mri'
-    # './CT_data_batch1/1',
+    # './train'
+    # './train_mri'
+    './CT_data_batch1/1',
     # './CT_data_batch1/2',
     # './CT_data_batch1/5',
     # './CT_data_batch1/6',
@@ -95,8 +95,8 @@ def get_ground_data(paths):
 
 print('Loading ct dicom training data ...')
 cts = read_dicoms(training_data)
-# imgs = get_pixels_hu(cts)
-imgs_mri = get_pixel_arrays(cts)
+imgs = get_pixels_hu(cts)
+# imgs_mri = get_pixel_arrays(cts)
 
 print('Loading png ground data ...')
 png_imgs = get_ground_data(ground_data)
@@ -123,8 +123,8 @@ png_imgs = get_ground_data(ground_data)
 
 # Initializing u-net and train the network
 fcn = UNet()
-# fcn.train(imgs, png_imgs) ##### TRAIN CT
-fcn.train(imgs_mri, png_imgs, (256,256,1)) ##### TRAIN MRI
+fcn.train(imgs, png_imgs) ##### TRAIN CT
+# fcn.train(imgs_mri, png_imgs, (256,256,1)) ##### TRAIN MRI
 
 
 
