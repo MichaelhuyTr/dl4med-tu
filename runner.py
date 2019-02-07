@@ -9,9 +9,9 @@ from model import UNet
 
 training_dirs = [
     # './MR_data_batch1/1/T1DUAL',
-    # './train'
+    './train_ct'
     # './train_mri'
-    './CT_data_batch1/1',
+    # './CT_data_batch1/1',
     # './CT_data_batch1/2',
     # './CT_data_batch1/5',
     # './CT_data_batch1/6',
@@ -120,15 +120,26 @@ png_imgs = get_ground_data(ground_data)
 # plt.imshow(first_dicom.pixel_array, cmap=plt.cm.bone)
 # plt.show()
 
+# Clipping CT data [-600, 200]
+imgs[imgs > 200] = 200
+imgs[imgs < -600] = -600
+
+# Create context inputs (sequences of 3 slices)
+print('Get contexts inputs ...')
+ct_seqs = []
+for idx, ct in enumerate(imgs):
+  if (idx != 0) and idx != (len(imgs)-1):
+      spatial_context = np.stack((imgs[idx-1], imgs[idx], imgs[idx+1]))
+      ct_seqs.append(spatial_context)
+ct_seqs_np = np.array(ct_seqs)
+
+# Remove first and last output segmentation mask
+cut_png_imgs = np.delete(png_imgs, [0, len(png_imgs)-1], 0) # axis = 0
 
 # Initializing u-net and train the network
 fcn = UNet()
-fcn.train(imgs, png_imgs) ##### TRAIN CT
+fcn.train(ct_seqs_np, cut_png_imgs) ##### TRAIN CT
 # fcn.train(imgs_mri, png_imgs, (256,256,1)) ##### TRAIN MRI
-
-
-
-
 
 # # TESTING
 # test_data_path = ['./CT_data_batch1/10/DICOM_anon/i0081,0000b.dcm']
